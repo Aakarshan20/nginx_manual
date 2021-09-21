@@ -1,0 +1,1 @@
+{"virtualbox":{"/data":{"guestpath":"/data","hostpath":"D:/vagrant_ubuntu_2021/data","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"D:/vagrant_ubuntu_2021","disabled":false,"__vagrantfile":true}}}
