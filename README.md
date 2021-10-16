@@ -137,3 +137,66 @@ worker 沒工作就把你關了
 ```
 # kill -INT `cat logs/nginx.pid`
 ```
+
+## 配置虛擬主機
+
+### 配置文件說明
+
+*conf/redis.conf*
+
+```
+worker_processes 1; //有一個工作的子進程 配置太大無意義 因為要爭奪CPU 資源
+
+events {
+    // 一般是配置 nginx 進程與連接的特性
+    // 如一個worker允ㄒ以幾個連接
+    worker_connections 1024; // 一個進程最大允許1024個連接
+}
+
+http{ // 配置http服務的主要段
+
+    server{ // 虛擬主機段
+        location { // 定位, 把特殊的路徑或文件再次定位, 如image目錄單獨處理, php 單獨處理
+
+        }
+
+    }
+
+    // 範例: 基於ip, 如果沒配置 就往下跑
+    server{
+        listen 80;
+        server_name 192.168.10.33; // ifconfig出現的ip
+
+        location / {
+            root html/ip; // 此處為/usr/local/nginx/html/ip (需事先創文件夾)
+            index index.html; // 此處為/usr/local/nginx/html/ip/index.html (需事先創文件)
+        }
+    }
+
+
+    // 範例: 基於域名的跳轉
+    server{
+        listen 80;// 監聽80端口
+        server_name z.com; //監聽server_name域名 須到 C\windows\System32\drivers\etc\hosts 裡面加
+
+        location / {
+            root z.com; // 此處為/usr/local/nginx/z.com (需事先創文件夾)
+            index index.html; // 此處為/usr/local/nginx/z.com/index.html (需事先創文件)
+        }
+    }
+
+    // 範例: 基於端口
+    server{
+        listen 2022;// 監聽2022端口
+        server_name z.com; //監聽server_name域名 須到 C\windows\System32\drivers\etc\hosts 裡面加
+
+        location / {
+            root /var/www/html; // 此處為/var/www/html (需事先創文件夾)
+            index index.html; // 此處為/var/www/html/index.html (需事先創文件)
+        }
+    }
+
+}
+
+```
+
