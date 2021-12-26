@@ -200,3 +200,60 @@ http{ // 配置http服務的主要段
 
 ```
 
+## nginx 日誌管理
+
+觀察nginx 的server段 可以看到如下訊息:
+#access_log logs/host.access.log main;
+
+說明該server 他的訪問日誌文件是 logs/host.access.log
+使用main 格式
+除了main格式 你也可以自訂一其他格式
+
+main格式是什麼?
+
+ #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+ #                  '$status $body_bytes_sent "$http_referer" '
+ #                  '"$http_user_agent" "$http_x_forwarded_for"';
+ 
+ main  格式是我們定義好一種日誌的格式 並起個名字 便於引用
+ 以上面的例子 main類型的日誌 記錄了remote_addr...http_x_forwarded_for
+ 等選項
+ 
+ 
+
+
+Nginx 允許針對不同的server做不同的log(有的web server 並不支持)
+
+如果沒配置 系統默認就是main 格式 而且放在access.log下
+
+例如:
+在server z.com 下加入log
+
+
+ server {
+        listen       80;
+        server_name  z.com;
+
+        location / {
+            root z.com;
+            index index.html;
+        }
+        access_log logs/z.com.access.log main; # 加這行
+    }
+
+勿忘把main 的註解打開
+測試配置文件
+```
+/usr/local/nginx/sbin/nginx -t
+```
+成功後重load nginx
+
+```
+/usr/local/nginx/sbin/nginx -s reload
+
+```
+
+
+
+
+
