@@ -211,17 +211,16 @@ http{ // 配置http服務的主要段
 
 main格式是什麼?
 
+```
  #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
  #                  '$status $body_bytes_sent "$http_referer" '
  #                  '"$http_user_agent" "$http_x_forwarded_for"';
  
+ ```
  main  格式是我們定義好一種日誌的格式 並起個名字 便於引用
  以上面的例子 main類型的日誌 記錄了remote_addr...http_x_forwarded_for
  等選項
  
- 
-
-
 Nginx 允許針對不同的server做不同的log(有的web server 並不支持)
 
 如果沒配置 系統默認就是main 格式 而且放在access.log下
@@ -233,7 +232,6 @@ Nginx 允許針對不同的server做不同的log(有的web server 並不支持)
  server {
         listen       80;
         server_name  z.com;
-
         location / {
             root z.com;
             index index.html;
@@ -253,7 +251,52 @@ Nginx 允許針對不同的server做不同的log(有的web server 並不支持)
 
 ```
 
+#定時任務完成日誌切割
+
+根據日期生成文件名: 使用date命令
+ 
+當前日期
+```
+#date
+```
+
+昨天日期
+```
+#date -d yesterday
+```
 
 
+修改當前日期
+```
+#date -s "2021-12-29 23:35:30"
+```
+
+寫入
+```
+#clock -w
+```
+
+取出格式化日期
+```
+#date -d yesterday +%Y
+```
+得
+2021
+
+```
+#date -d yesterday +%y
+```
+得
+21
+
+取出YYYY_mm_dd
+
+```
+# date -d yesterday +%Y_%m_%d
+
+```
+
+得
+2021_12_29
 
 
