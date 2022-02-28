@@ -299,4 +299,239 @@ Nginx 允許針對不同的server做不同的log(有的web server 並不支持)
 得
 2021_12_29
 
+# location 語法
+
+location 有定位的意思 根據uri來進行不同的定位
+
+在虛擬主機的配置中是必不可少的 location可把網站的不同部分
+
+定位道不同的處理方式上
+
+比如碰到.php 要如何調用php 解釋器
+
+location的用法
+
+```
+location [=|~|~*|^~] patt{
+
+}
+```
+中括號可以不寫任何參數 此時稱一般匹配
+
+可分為三種
+
+location = patt {} [精準匹配]
+location patt {} [一般匹配]
+location ~ patt {} [正則匹配]
+
+## 作用順序
+
+如果有精準匹配 則停止匹配過程
+location = patt{
+
+}
+
+如果 $uri = patt, 匹配成功 使用configA  
+
+
+> 但是請參照以下設定
+
+```
+ 
+location / {
+	root html/ip;
+	index index.html;
+}
+```
+
+> 結果將是導向 html/ip這個目錄
+
+原因如下
+
+1. 使用精準匹配時 固然會導到 
+```
+location = / 
+```
+的模塊
+
+2. 但是 location = / 終究會導到index
+
+而 /index.html 無法被精確匹配到
+
+```
+location = / 
+```
+
+3. 所以往下配匹配到
+```
+location / {
+
+}
+```
+
+正則匹配與一般匹配競合
+
+請看以下情境
+
+```
+......
+
+location / { #一般匹配
+	root /use/local/nginx/html;
+	index index.html index.htm;
+}
+
+location ~ image { # 正則匹配
+		root /var/www/;
+		index index.html;
+
+}
+
+......
+
+```
+
+若訪問 http://xx.com/image/cover.png
+
+此時固然 / 與 /image/cover.png 匹配成功
+
+但正則 /image 與 /image/cover.png 似亦能匹配  
+
+則何者將發揮作用?
+
+
+
+實驗開始:
+
+1. 創建正則專用的圖片
+
+```
+# mkdir /var/www/image
+``` 
+
+進入該資料夾
+
+```
+# cd /var/ww/image
+```
+
+取得圖片
+
+```
+# wget [隨便一個圖片網址]
+```
+
+將取得的圖片改名
+
+```
+ mv [下載圖片名] cover.png
+```
+
+2. 創建一般匹配用的圖片
+
+```
+# mkdir /usr/local/nginx/html/image
+# cd /usr/local/nginx/html/image
+# wget [隨便一個圖片網址 但不要跟 1.的圖片相同]
+
+```
+
+將取得的圖片改名
+
+```
+ mv [下載圖片名] cover.png
+```
+3. 編輯index.html
+
+```
+vim /usr/local/nginx/html/index.html
+```
+
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<img src="./image/cover.png"/><!-- 加上這行觀察 -->
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+<!-- <script>
+        window.location.href ='/';
+</script> -->
+</html>
+```
+
+
+重啟後生效
+
+```
+# ./usr/local/nginx/sbin/nginx -s reload
+```
+
+ 
+
+結論: 出現/var/www/image/cover.png, 代表正則發揮作用(會先去執行一般匹配, 再執行正則匹配 即後蓋前)
+
+
+
+如有錯誤發生 請觀察日誌
+```
+# tail /usr/local/nginx/loga/error.log
+```
+
+
+
+nginx 一般匹配優先度
+
+
+請看以下情境
+
+```
+......
+
+location / { #一般匹配
+	root /usr/local/nginx/html;
+	index index.html index.htm;
+}
+
+location /foo { # 一般匹配
+	root /var/www/html;
+	index index.html;
+
+}
+
+......
+
+```
+
+我們訪問 http://xxx.com/foo
+
+對於uri "/foo" 兩個 location 似都能匹配
+
+結論: 
+此時真正訪問的是 /foo
+
+
+
+
+
 
