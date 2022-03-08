@@ -142,7 +142,7 @@ worker 沒工作就把你關了
 
 ### 配置文件說明
 
-*conf/redis.conf*
+*conf/nginx.conf*
 
 ```
 worker_processes 1; //有一個工作的子進程 配置太大無意義 因為要爭奪CPU 資源
